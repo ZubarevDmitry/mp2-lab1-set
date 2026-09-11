@@ -7,46 +7,91 @@
 
 #include "tbitfield.h"
 
-TBitField::TBitField(int len)
+ //конструктор с параметром - максимальной длиной битового поля (BitLen)
+TBitField::TBitField(int len) : BitLen(len)
+{
+    if (len < 0) {
+        throw "Negative number of bytes. Try another one";
+    }
+    MemLen = (len + (sizeof(TELEM) * 8) - 1) / (sizeof(TELEM) * 8);
+    pMem = new TELEM[MemLen];
+    for (int i = 0; i < MemLen; i++) {
+        pMem[i] = 0;
+    }
+}
+
+// конструктор копирования
+TBitField::TBitField(const TBitField &bf)
 {
 }
 
-TBitField::TBitField(const TBitField &bf) // конструктор копирования
-{
-}
-
+//деструктор, должен лишь освободить динамическую память
 TBitField::~TBitField()
 {
+    delete[] pMem;
 }
 
-int TBitField::GetMemIndex(const int n) const // индекс Мем для бита n
+// индекс Мем для бита n (индекс блока-элемента TELEM в массиве pMem)
+int TBitField::GetMemIndex(const int n) const
 {
-    return 0;
+    if (n < 0 || n >= BitLen) {
+        throw "Index is out of range. Try another one";
+    }
+    return (n / (sizeof(TELEM) * 8));
 }
 
-TELEM TBitField::GetMemMask(const int n) const // битовая маска для бита n
+// битовая маска для бита n
+TELEM TBitField::GetMemMask(const int n) const
 {
-    return TELEM();
+    if (n < 0 || n >= BitLen) {
+        throw "Index is out of range. Try another one";
+    }
+    TELEM mask = (TELEM)1 << (n % (sizeof(TELEM) * 8));
+    return mask;
 }
 
 // доступ к битам битового поля
 
-int TBitField::GetLength(void) const // получить длину (к-во битов)
+// получить длину (к-во битов)
+int TBitField::GetLength(void) const
 {
-  return 0;
+  return BitLen;
 }
 
-void TBitField::SetBit(const int n) // установить бит
+// установить бит
+void TBitField::SetBit(const int n)
 {
+    if (n < 0 || n >= BitLen) {
+        throw "Index is out of range. Try another one";
+    }
+    int MemIndex = GetMemIndex(n);
+    TELEM MemMask = GetMemMask(n);
+    pMem[MemIndex] = pMem[MemIndex] | MemMask; 
 }
 
-void TBitField::ClrBit(const int n) // очистить бит
+// очистить бит
+void TBitField::ClrBit(const int n)
 {
+    if (n < 0 || n >= BitLen) {
+        throw "Index is out of range. Try another one";
+    }
+    int MemIndex = GetMemIndex(n);
+    TELEM MemMask = GetMemMask(n);
+    pMem[MemIndex] = pMem[MemIndex] & ~MemMask;
 }
 
-int TBitField::GetBit(const int n) const // получить значение бита
+// получить значение бита
+int TBitField::GetBit(const int n) const
 {
-  return 0;
+    if (n < 0 || n >= BitLen) {
+        throw "Index is out of range. Try another one";
+    }
+    int MemIndex = GetMemIndex(n);
+    TELEM MemMask = GetMemMask(n);
+    TELEM temp = pMem[MemIndex];
+    temp = temp & MemMask;
+    temp = temp >> (n % (sizeof(TELEM) * 8));
+    return temp;
 }
 
 // битовые операции
