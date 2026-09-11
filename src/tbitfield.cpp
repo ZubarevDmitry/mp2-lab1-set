@@ -96,44 +96,52 @@ int TBitField::GetBit(const int n) const
 
 // битовые операции
 
-TBitField& TBitField::operator=(const TBitField &bf) // присваивание
+// присваивание
+TBitField& TBitField::operator=(const TBitField &bf)
 {
     return *this;
 }
 
-int TBitField::operator==(const TBitField &bf) const // сравнение
+// сравнение
+int TBitField::operator==(const TBitField &bf) const 
 {
   return 0;
 }
 
-int TBitField::operator!=(const TBitField &bf) const // сравнение
+// сравнение
+int TBitField::operator!=(const TBitField &bf) const
 {
   return 0;
 }
 
-TBitField TBitField::operator|(const TBitField &bf) // операция "или"
+// операция "или"
+TBitField TBitField::operator|(const TBitField &bf)
 {
     return TBitField(0);
 }
 
-TBitField TBitField::operator&(const TBitField &bf) // операция "и"
+// операция "и"
+TBitField TBitField::operator&(const TBitField &bf)
 {
     return TBitField(0);
 }
 
-TBitField TBitField::operator~(void) // отрицание
+// отрицание
+TBitField TBitField::operator~(void)
 {
     return TBitField(0);
 }
 
 // ввод/вывод
 
-std::istream &operator>>(std::istream &istr, TBitField &bf) // ввод
+// ввод
+std::istream &operator>>(std::istream &istr, TBitField &bf)
 {
     return istr;
 }
 
-std::ostream &operator<<(std::ostream &ostr, const TBitField &bf) // вывод
+// вывод
+std::ostream &operator<<(std::ostream &ostr, const TBitField &bf)
 {
     return ostr;
 }
