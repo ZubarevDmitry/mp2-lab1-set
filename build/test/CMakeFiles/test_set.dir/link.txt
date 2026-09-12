@@ -1,1 +1,0 @@
-/usr/bin/c++ -rdynamic -Wl,--dependency-file=CMakeFiles/test_set.dir/link.d CMakeFiles/test_set.dir/test_main.cpp.o CMakeFiles/test_set.dir/test_tbitfield.cpp.o CMakeFiles/test_set.dir/test_tset.cpp.o -o test_set  ../lib/libgtest.a ../src/libset.a

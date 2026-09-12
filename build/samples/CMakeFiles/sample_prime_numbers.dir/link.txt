@@ -1,1 +1,0 @@
-/usr/bin/c++ -rdynamic -Wl,--dependency-file=CMakeFiles/sample_prime_numbers.dir/link.d CMakeFiles/sample_prime_numbers.dir/sample_prime_numbers.cpp.o -o ../sample_prime_numbers  ../src/libset.a
