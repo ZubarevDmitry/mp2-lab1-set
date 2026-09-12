@@ -23,6 +23,12 @@ TBitField::TBitField(int len) : BitLen(len)
 // конструктор копирования
 TBitField::TBitField(const TBitField &bf)
 {
+    BitLen = bf.BitLen;
+    MemLen = bf.MemLen;
+    pMem = new TELEM[MemLen];
+    for (int i = 0; i < MemLen; i++) {
+        pMem[i] = bf.pMem[i];
+    }
 }
 
 //деструктор, должен лишь освободить динамическую память
@@ -99,49 +105,112 @@ int TBitField::GetBit(const int n) const
 // присваивание
 TBitField& TBitField::operator=(const TBitField &bf)
 {
+    if (this == &bf) {
+        return *this;
+    }
+    BitLen = bf.BitLen;
+    if (MemLen == bf.MemLen) {
+        for (int i = 0; i < MemLen; i++) {
+            pMem[i] = bf.pMem[i];
+        }
+        return *this;
+    }
+    MemLen = bf.MemLen;
+    delete[] pMem;
+    pMem = new TELEM[MemLen];
+    for (int i = 0; i < MemLen; i++) {
+        pMem[i] = bf.pMem[i];
+    }
     return *this;
 }
 
 // сравнение
 int TBitField::operator==(const TBitField &bf) const 
 {
-  return 0;
+    if (BitLen != bf.BitLen) {
+        return 0;
+    }
+    for (int i = 0; i < MemLen; i++) {
+        if (pMem[i] != bf.pMem[i]) {
+            return 0;
+        }
+    }
+    return 1;
 }
 
 // сравнение
 int TBitField::operator!=(const TBitField &bf) const
 {
-  return 0;
+  return !(*this == bf);
 }
 
 // операция "или"
+//почему этот оператор не константный? он же создает новый объект, не изменяя исходные
 TBitField TBitField::operator|(const TBitField &bf)
 {
-    return TBitField(0);
+    TBitField temp = TBitField(std::max(BitLen, bf.BitLen));
+    if (MemLen <= bf.MemLen) {
+        temp = bf;
+        for (int i = 0; i < MemLen; i++) {
+            temp.pMem[i] = temp.pMem[i] | pMem[i];
+        }
+    }
+    else {
+        temp = *this;
+        for (int i = 0; i < bf.MemLen; i++) {
+            temp.pMem[i] = temp.pMem[i] | bf.pMem[i];
+        }
+    }
+    return temp;
 }
 
 // операция "и"
 TBitField TBitField::operator&(const TBitField &bf)
 {
-    return TBitField(0);
+    TBitField temp = TBitField(std::min(BitLen, bf.BitLen));
+    for (int i = 0; i < temp.MemLen; i++) {
+        temp.pMem[i] = pMem[i] & bf.pMem[i];
+    }
+    return temp;
 }
 
 // отрицание
 TBitField TBitField::operator~(void)
 {
-    return TBitField(0);
+    TBitField temp = TBitField(BitLen);
+    for (int i = 0; i < temp.MemLen; i++) {
+        temp.pMem[i] = ~pMem[i];
+    }
+    int RestBits = temp.BitLen % (sizeof(TELEM) * 8);
+    if (RestBits != 0) {
+        TELEM mask = (1u << RestBits) - 1;
+        temp.pMem[temp.MemLen - 1] = temp.pMem[temp.MemLen - 1] & mask;
+    }
+    return temp;
 }
 
 // ввод/вывод
-
 // ввод
 std::istream &operator>>(std::istream &istr, TBitField &bf)
 {
+    char value;
+    for (int i = 0; i < bf.GetLength(); i++) {
+        istr >> value;
+        if (value == '1') {
+            bf.SetBit(i);
+        }
+        else {
+            bf.ClrBit(i);
+        }
+    }
     return istr;
 }
 
 // вывод
 std::ostream &operator<<(std::ostream &ostr, const TBitField &bf)
 {
+    for (int i = 0; i < bf.GetLength(); i++) {
+        ostr << bf.GetBit(i);
+    }
     return ostr;
 }
